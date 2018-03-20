@@ -1,0 +1,88 @@
+
+
+<html>
+
+<body>
+    <form method="POST">
+        <br>
+        <br>
+        <label>Firstname :</lable>
+            <input id="firstname" name="frist_name" type="text">
+        <br>
+        <br>
+        <label>Lastname :</lable>
+            <input id="lastname" name="last_name" type="text">
+        <br>
+        <br>
+         <label>Email    :</lable>
+            <input id="email" name="email" type="text">
+         
+        <br> 
+        <br>       
+        <label>password  :</lable>
+            <input id="password" name="password" type="text">  
+            <br>
+        <br>
+
+                <button id="enter" type="submit">Join</button>
+
+        <br>
+        <br>
+    </form>
+    <br>
+    <a href="http://127.0.0.1:8000/signin" class="button">Already have account? Sign In</a>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(enter).click(function (event) {
+              event.preventDefault();
+              var first_name = $("#firstname").val();
+              var last_name = $("#lastname").val();
+              var email = $("#email").val();
+              var password = $("#password").val();
+              var username=$("#email").val();
+              data={ "first_name": first_name,
+                          "last_name": last_name,"email":email,"username":username,
+                          "password":password};
+            console.log(data);
+              
+                $.ajax({
+                    type: 'POST',
+                    url: "http://127.0.0.1:8000/user/",
+                    dataType: "json",
+                    data: data}).done(function(res) { 
+                         console.log(res)
+
+                         var uid = res.uid;
+                         console.log(uid)
+                          // check whether response is received
+                     window.location.href = "http://127.0.0.1:8000/home/"+uid;
+                         
+                                  })
+                     .fail(function(e) { alert('error'+e); })
+
+
+
+
+                    // success: function (data) {
+                    //               console.log("success");
+
+                    //     
+                    // },
+                    // error: function (e) {
+                    //               console.log("failed");
+
+                    //     alert(data);
+                        
+                    
+
+            });
+        });
+    </script>
+</body>
+
+</html>

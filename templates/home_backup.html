@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Workoutplan</title>
+  </head>
+  <body>
+    <h1>Workoutplans</h1>
+    <form>
+    <select multiple="multiple" id="select" name="selected_plans[]">
+      {% for each in plans %}
+
+      <option  class="plan">{{each.title}}</option>
+      {% endfor %}
+    </select>
+    <input type="submit" id="add_plan" value="Add workout plan">
+  </form>
+  <p style="display:none;" id="pk">{{pk}}</p>
+   <table border="1">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Plans</th>
+        </tr>
+      </thead>
+      <tbody>
+        <td>{{userdata.user.username}}</td> 
+       
+        {% for each in user_plan %}
+           
+            <td>
+              <a href="" id="title">{{ each.title }}</a><br>
+              <button id="deleteplan">Delete</button>
+            </td>{% endfor %}
+
+      
+      </tbody>
+    </table> 
+
+    <div id="planview" style="position: relative;left: 50px;top:50px;">
+     
+    </div>
+  </body>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+  <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#add_plan").click(function (event) {
+               var add_plan = $('#select').val();
+               add_plan=add_plan
+        
+              console.log(add_plan);
+            
+              event.preventDefault();
+              data={"plan":add_plan};
+              
+              console.log(data);
+              var pk=$('#pk').html();
+              console.log(pk);
+                $.ajax({
+                    type: 'POST',
+                    url: "http://127.0.0.1:8000/user/"+pk+'/',
+                    dataType: "json",
+                    data:data,
+                    success: function (data) {
+                        alert("success");
+                    },
+                    error: function (e) {
+                        alert("error");
+                        
+                    }
+                });
+            });
+
+
+
+            $('.plan').click(function(){
+              var title=$(this).html();
+              
+              console.log(title,pk)
+              $.ajax({
+                    type: 'GET',
+                    url: "http://127.0.0.1:8000/plan/"+title,
+                    dataType: "json",
+                    data:'',
+                    success: function (data) {
+                        
+                        console.log(data);
+
+                    },
+                    error: function (e) {
+                        alert("error");
+                        
+                    }
+                });
+           });
+
+
+
+
+            $("#deleteplan").click(function (event) {
+               
+        
+              
+            
+              event.preventDefault();
+              var pk=$('#pk').html();
+              var title=$('#title').html();
+              data={'pk':pk,'title':title};
+                $.ajax({
+                    type: 'DELETE',
+                    url: "http://127.0.0.1:8000/user/"+pk+'/',
+                    dataType: "json",
+                    data:data,
+                    success: function (data) {
+                        alert("success");
+                        $('#planview').html()
+
+                    },
+                    error: function (e) {
+                        alert("error");
+                        
+                    }
+                });
+            });
+        });
+    </script>
+</html>

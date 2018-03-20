@@ -1,0 +1,57 @@
+<html>
+
+<body>
+    <form method="POST">
+
+        
+        <!-- <label>username</lable>
+            <input id="username" name="username" type="text"> -->
+         <label>Email</lable>
+            <input id="email" name="email" type="text">
+        
+                
+        <label>password</lable>
+            <input id="password" name="password" type="text">
+                <button id="enter" type="submit">Signin</button>
+    </form>
+    
+     <a href="http://127.0.0.1:8000/signup" class="button">New user? Join us</a>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(enter).click(function (event) {
+              event.preventDefault();
+              var email = $("#email").val();
+              var password = $("#password").val();
+              data={ "email":email,"password":password};
+            console.log(data);
+              
+                $.ajax({
+                    type: 'POST',
+                    url: "http://127.0.0.1:8000/authenticate",
+                    dataType: "json",
+                    data: data }).done(function(res) { 
+                         if(res.value==1){
+                             console.log(res)
+                             var uid=res.user_id;
+                          // check whether response is received
+                      window.location.href = "http://127.0.0.1:8000/home/"+uid;
+                         }
+                         else{
+                            alert("incorrect data")
+                            window.location.href = "http://127.0.0.1:8000/signin/"
+                         }
+                                  }) 
+                     .fail(function(e) { alert('error'+e); })
+                });
+        });
+
+
+
+
+    </script>
+</body>
+
+</html>

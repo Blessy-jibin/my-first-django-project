@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Workoutplan</title>
+  </head>
+  <body>
+    <h1>Welcome to Virtuagym</h1>
+    <button id="add_plan" style="margin-bottom:20px;">Add workout plans</button>
+<button id="show-plans">Show my plans</button>
+
+<p id='pk' style="display: none;">{{pk}}</p>
+<div id="days_table">
+</div>
+<div id="exercises">
+</div>
+<div id="add_button">
+</div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+        var exrs;
+        var days;
+        var plan_edit_id;
+        var index_plan;
+        $("#add_plan").click(function (event) {
+            $.ajax({
+                    type: 'GET',
+                    url: "http://127.0.0.1:8000/days",
+                    dataType: "json",
+                    data:'',
+                    success: function (data) {
+                        days = data;
+                        $.ajax({
+                            type: 'GET',
+                            url: "http://127.0.0.1:8000/exercises",
+                            dataType: "json",
+                            data:'',
+                            success: function (data) {
+                                exrs=data;
+                                console.log(exrs);
+                                var txt=' '
+                                txt+="<div id='div1'><input type='text' name='plan_title' value = 'Give Plan Name', id='plan_title'>" 
+                                txt += "<br><br>Select the day and add excercises <br>use ctl to select multiple<br><table border='0' id = 'table1'><tr>"
+                                for (i=0;i<days.length;i++) {
+                                    var id = "id"+i;
+                                    txt += "<td> <button class='day' id ='btn"+i+"' value ="+i+">"+ days[i] +"</button></td>";                   
+                                }
+                                txt += "</tr><tr>";
+                                for (i=0;i<days.length;i++) {
+                                    var id = "id"+i;
+                                    txt += "<td class='exercises' id = "+id +" />"
+                                }
+                                 txt += "</tr></table><br><br>";
+                                 txt += "<button id ='buttonadd'>Add Plan</button></div>";
+                             document.getElementById("days_table").innerHTML = txt;
+                            },
+                            error: function (e) {
+                                alert("error"); 
+                            }
+                            });
+
+                      },
+                        error: function (e) {
+                            alert("error");
+                            
+                        }
+                    });
+
+                });
+       var plan_data=[];
+       var day_data=[];
+
+       var shown = {};
+
+       $('.day').live('click',function (event) {
+            var value=$(this).attr("value");
+            var id = 'id'+value;
+            console.log(id);
+            var html = $('#'+id);
+            if ( shown[id] == 1) {
+            } else {
+                var txt=' '
+                txt += "<select multiple='multiple' id= 'select"+value+"' name='selected[]'>"
+                for (x in exrs) {
+                    txt += "<option>" + exrs[x]+ "</option>";
+                }
+                txt += "</select>" ;
+                $('#'+id).html(txt);
+                shown[id] = 1;
+            }
+         });
+    $('#buttonadd').live('click',function(event){
+        
+        var count =  days.length;
+        console.log(count);
+        var day_data = [];
+        for (i=0;i<count;i++) {
+             var id  = "select"+i;
+            var day_exercise = $('#'+id ).val();
+            var day_number=$('#btn'+i).html();
+                        console.log(day_number,day_exercise);
+
+            var day_dic={};
+            day_dic['day_number']=day_number;
+            day_dic['exercises']=day_exercise;
+            if(day_exercise != null) {
+                day_data.push(day_dic);
+            }
+        }
+        var plan_title=$('#plan_title').val();
+        plan_dic={}
+        plan_dic['title'] = plan_title;
+        plan_dic['day']=day_data;
+        plan_data.push(plan_dic);
+        var pk=$('#pk').html();
+        console.log('plan_dic',plan_dic);
+        plan = JSON.stringify(plan_dic);
+                 $.ajax({
+                        type: 'POST',
+                        url: "http://127.0.0.1:8000/user/"+pk+"/plan/",
+                        dataType: "json",
+                        data:{'plan':plan},
+                        success: function (data) {
+                            
+                            location.reload();
+                          
+                        },
+                        error: function (e) {
+                            alert("error");
+                            
+                        }
+                    });
+    });
+
+
+function shpw_plans (event) {
+   var pk=$('#pk').html();            
+    $.ajax({
+        type: 'GET',
+        url: "http://127.0.0.1:8000/user/"+pk+"/plan",
+        dataType: "json",
+        data:'',
+        success: function (data) {
+            var plans=data;
+            refreshthe_page(plans);
+          },
+        error: function (e) {
+            alert("error");
+            }
+      });
+    };
+
+
+
+
+
+
+    function refreshthe_page (plans){
+        $('#div1').hide();
+        console.log(plans);
+         var txt=' <div> ';
+        index_plan = {};
+        for(i in plans ) {
+            plan = plans[i];
+
+            var days=plan['days'];
+            var planid = plan['planid'];
+            index_plan[i] = planid;
+
+            txt += "<br>"+ plan['title'] +"<br><div id ='mydiv"+i+"'><table id='"+i+"' border='0'><tr>"
+            for (l=0;l<days.length;l++) {
+                var id = "id"+l;
+                txt += "<td> <button class='day' id ='btn"+l+"' value ="+l+">"+ days[l]['day_number'] +"</button></td>";                   
+            }
+            txt += "</tr><tr>";
+            for (k=0;k<days.length;k++) {
+                var id = "id"+k;
+                txt += "<td class='exercises' id = "+id +" />"
+            }
+
+            for (j=0;j<days.length;j++) {
+                var id = "id"+j;
+                txt += "<select multiple='multiple' id= 'select"+j+"' name='selected[]'>"
+                var exrs = days[j]['exercises'];
+                for (x in exrs) {
+                    txt += "<option>" + exrs[x]+ "</option>";
+                }
+                txt += "</select>" ;
+                $('#'+id).html(txt);
+            }
+
+
+            txt += "</tr></table>";
+            txt += "<button style='margin-right:12px;' class='deleteButton' id='del"+planid+"' value="+planid+">Delete Plan</button>";
+            // txt += "<button style='margin-right:12px;' id='deleteButton' value="+planid+">Delete Plan</button>";
+            txt += "<button id ='edit"+planid+"' class='editButton' value="+i+">Edit Plan</button><hr/> ";
+            txt += "</div>";
+            // var pid=$('#plan_id'+planid).html();
+            // console.log(pid);
+            
+        }
+
+      
+        
+        txt +=' </div> ';
+        
+
+        // for (i=0;i<days.length;i++) {
+        //         var id = table+i;
+        //         var id1 = id+i;
+
+        //         $('#'+id ).getElementById(id1).selected = all;
+        // }
+        $('#days_table').html(txt);
+
+    }
+        
+
+
+
+
+    $("#show-plans").click(shpw_plans);
+    shpw_plans(); 
+
+    
+    $(".deleteButton").live('click',function(event){
+       var pk=$('#pk').html();
+       var planid=$(this).val();
+
+       $.ajax({
+        type: 'DELETE',
+        url: "http://127.0.0.1:8000/user/"+pk+"/plan/"+planid,
+        dataType: "json",
+        data:'',
+        success: function (data) {
+            shpw_plans(); 
+
+          },
+        error: function (e) {
+            alert("error");
+            }
+      });
+    });
+    
+
+    $('.editButton').live('click',function(event){
+        var index =$(this).val();
+        var plan_edit_id = index_plan[index]; 
+        $.ajax({
+                type: 'GET',
+                url: "http://127.0.0.1:8000/days",
+                dataType: "json",
+                data:'',
+                success: function (data) {
+                    days = data;
+                    $.ajax({
+                        type: 'GET',
+                        url: "http://127.0.0.1:8000/exercises",
+                        dataType: "json",
+                        data:'',
+                        success: function (data) {
+                            exrs = data;
+                            console.log(exrs);
+                            var txt=' '
+                            txt+="<div id='divx'><input type='text' name='plan_title' value = 'Edit Name', id='plan_title'>" 
+                            txt += "<br><br> Select the day and add excercises <br> use ctl to select multiple<br><table border='0' id = 'table1'><tr>"
+                            for (i=0;i<days.length;i++) {
+                                var id = "id"+i;
+                                txt += "<td> <button class='day' id ='btn"+index+''+i+"' value ="+index+""+i+">"+ days[i] +"</button></td>";                   
+                            }
+                            txt += "</tr><tr>";
+                            for (i=0;i<days.length;i++) {
+                                txt += "<td class='exercises' id = id"+index+""+i +" />"
+                            }
+                             txt += "</tr></table><br><br>";
+                             txt += "<button id ='saveChanges' value ="+index+ ">Save</button></div>";
+                         document.getElementById("mydiv"+index).innerHTML = txt;
+                        },
+                        error: function (e) {
+                            alert("error"); 
+                        }
+                        });
+
+                  },
+                    error: function (e) {
+                        alert("error");
+                        
+                    }
+
+
+
+                });
+     });
+
+ $('#saveChanges').live('click',function(event){
+        var index=$(this).val();
+        var plan_edit_id = index_plan[index];
+        console.log('gonna edit this plan',index,plan_edit_id);
+        var count =  days.length;
+        console.log(count);
+        var day_data = [];
+        for (i=0;i<count;i++) {
+            var id  = "select"+index+''+i;
+            var day_exercise = $('#'+id ).val();
+            var btnid= 'btn'+index+''+i;
+            var day_number=$('#'+btnid).html();
+            console.log(day_number,day_exercise);
+
+            var day_dic={};
+            day_dic['day_number']=day_number;
+            day_dic['exercises']=day_exercise;
+            if(day_exercise != null) {
+                day_data.push(day_dic);
+            }
+        }
+        var plan_title=$('#plan_title').val();
+        plan_dic={}
+        plan_dic['title'] = plan_title;
+        plan_dic['day']=day_data;
+        plan_data.push(plan_dic);
+        var pk=$('#pk').html();
+        console.log('plan_dic',plan_dic);
+        plan = JSON.stringify(plan_dic);
+                 $.ajax({
+                        type: 'PUT',
+                        url: "http://127.0.0.1:8000/user/"+pk+"/plan/"+plan_edit_id,
+                        dataType: "json",
+                        data:{'plan':plan},
+                        success: function (data) {
+                            location.reload();
+                          
+                        },
+                        error: function (e) {
+                            alert("error");
+                        }
+                    });
+    });
+
+
+
+
+
+});
+
+    </script>
+</html>

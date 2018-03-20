@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Exercise</title>
+  </head>
+  <body>
+    <h1>Exercise</h1>
+   
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Exercise_ID</th>
+          <th>Exercise</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+        {% for exercise in exercises %}
+          <tr>
+            <td>{{exercise.Exercise_id}}</td>
+            <td>
+              <a href="{% url 'exercise' exercise.pk %}"> {{ exercise.exercise_name }} </a> 
+             </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

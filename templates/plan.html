@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Workoutplan</title>
+  </head>
+  <body>
+    <h1>Workoutplans</h1>
+    <form>
+    <select multiple="multiple" name="plan[]">{% for plan in plans %}
+      <option>plan.title</option>
+      {% endfor %}
+    </select>
+    <input type="submit" id="add_plan">
+  </form>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Plans</th>
+        </tr>
+      </thead>
+      <tbody>
+        <td>{{user_data.username}}</td>
+        {% for each in user_data.plan %}
+          
+            <td>
+              <a href="">{{ user_data.plan }}</a><br>
+            </td>{% endfor %}
+      </tbody>
+    </table>
+  </body>
+
+
+  <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#add_plan").click(function (event) {
+            data=plan;
+            console.log(data);
+              event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: "http://127.0.0.1:8000/user/<int:pk>/plan",
+                    dataType: JSON,
+                    data: data,
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (e) {
+                        alert(data);
+                        
+                    }
+                });
+            });
+        });
+    </script>
+</html>

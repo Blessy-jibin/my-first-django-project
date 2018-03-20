@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Workoutplan</title>
+  </head>
+  <body>
+    <h1>Workoutplans</h1>
+    <button>Add workout plan</button>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Plan</th>
+          <th>day1</th>
+          <th>day2</th>
+          <th>day3</th>
+          <th>day4</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for plan in plans %}
+          <tr>
+            <td>
+              <a href="{% url 'plan' plan.pk %}">{{ plan.name }}</a><br>
+              
+            </td>
+            <td>plan.day1</td>
+            <td>plan.day2</td>
+            <td>plan.day3</td>
+            <td>plan.day4</td>s
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+$(document).ready(function() {
+
+    $('#submit_btn').click(function(){
+
+            var data = {};
+            data.firstname = $('#firstname').val();
+            data.lastname = $('#lastname').val();
+            data.username = $('#username').val();
+            data.email = $('#email').val();
+            data.password2 = $('#password2').val();
+
+
+            $.ajax({
+                type: "POST",
+                url: "../php/newuser.php",
+                data: data,
+                cache: false,
+                success: function (response) {
+
+                }
+            });
+                return false;
+        });
+
+    });
