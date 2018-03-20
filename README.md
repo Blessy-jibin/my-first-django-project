@@ -1,2 +1,2 @@
-# Virtuagym
+# Django 
 Assignment
